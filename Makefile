@@ -6,6 +6,19 @@ APP_NAME=emysql
 MODULES=$(shell ls -1 src/*.erl | awk -F[/.] '{ print $$2 }' | sed '$$q;s/$$/,/g')
 MAKETIME=$(shell date)
 
+## Check if we are on erlang version that has namespaced types
+ERL_NT=$(shell escript ./support/ntype_check.escript)
+
+## Check if we are on erlang version that has erlang:timestamp/0
+ERL_TS=$(shell escript ./support/timestamp_check.escript)
+
+ifeq ($(ERL_NT),true)
+ERLC_NT_FLAG=-Dnamespaced_types
+endif
+ifeq ($(ERL_TS),true)
+ERLC_TS_FLAG=-Dtimestamp_support
+endif
+
 all: crypto_compat app
 	(cd src;$(MAKE))
 
@@ -80,7 +93,7 @@ CT_RUN = ct_run \
 CT_SUITES=environment basics conn_mgr
 
 build-tests:
-	erlc -v -o test/ $(wildcard test/*.erl) -pa ebin/
+	erlc -v $(ERLC_NT_FLAG) $(ERLC_TS_FLAG) -o test/ $(wildcard test/*.erl) -pa ebin/
 
 test: all build-tests
 	@mkdir -p logs
