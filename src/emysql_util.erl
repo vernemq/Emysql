@@ -44,6 +44,11 @@
          as_record/4
 ]).
 
+%% Erlang version-specific functions
+-export([
+	timestamp/0
+]).
+
 affected_rows(P) -> emysql:affected_rows(P).
 field_names(R) -> emysql:field_names(R).
 insert_id(P) -> emysql:insert_id(P).
@@ -55,3 +60,8 @@ as_proplist(Res) -> emysql:as_proplist(Res).
 as_record(Res, RecName, Fields) -> emysql:as_record(Res, RecName, Fields).
 as_record(Res, RecName, Fields, Fun) -> emysql:as_record(Res, RecName, Fields, Fun).
 
+-ifdef(timestamp_support).
+timestamp() -> erlang:timestamp().
+-else.
+timestamp() -> erlang:now().
+-endif.

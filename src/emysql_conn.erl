@@ -334,7 +334,7 @@ need_test_connection(Conn) ->
      (Conn#emysql_connection.last_test_time + Conn#emysql_connection.test_period < now_seconds()).
 
 now_seconds() ->
-   {M, S, _} = ?TIMESTAMP,
+   {M, S, _} = emysql_util:timestamp(),
    M * 1000000 + S.
 
 %%--------------------------------------------------------------------
