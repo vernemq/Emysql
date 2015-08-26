@@ -136,23 +136,6 @@
 % for record and constant defines
 -include("emysql.hrl").
 
--export_type([
-         gb_tree/0,
-         queue/0,
-         dict/0
-]).
-
--ifdef(namespaced_types).
--type gb_tree() :: gb_trees:tree().
--type queue() :: queue:queue().
--type dict() :: dict:dict().
--else.
--type gb_tree() :: gb_tree().
--type queue() :: queue().
--type dict() :: dict().
--endif.
-
-
 %% @spec start() -> ok
 %% @doc Start the Emysql application.
 %%
@@ -686,7 +669,7 @@ result_type(#eof_packet{})    -> eof.
 -spec as_dict(Result) -> Dict
   when
     Result :: #result_packet{},
-    Dict :: emysql:dict().
+    Dict :: t_dict().
 as_dict(Res) -> emysql_conv:as_dict(Res).
 
 

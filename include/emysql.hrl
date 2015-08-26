@@ -25,6 +25,22 @@
 %% FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR
 %% OTHER DEALINGS IN THE SOFTWARE.
 
+-ifdef(namespaced_types).
+-type t_gb_tree() :: gb_trees:tree().
+-type t_queue() :: queue:queue().
+-type t_dict() :: dict:dict().
+-else.
+-type t_gb_tree() :: gb_tree().
+-type t_queue() :: queue().
+-type t_dict() :: dict().
+-endif.
+
+-ifdef(timestamp_support).
+-define(TIMESTAMP,erlang:timestamp()).
+-else.
+-define(TIMESTAMP,erlang:now()).
+-endif.
+
 -record(pool, {pool_id :: atom(),
 	       size :: number(),
 	       user :: string(),
@@ -33,9 +49,9 @@
 	       port :: number(),
 	       database :: string(),
 	       encoding :: utf8 | latin1 | {utf8, utf8_unicode_ci} | {utf8, utf8_general_ci},
-	       available=queue:new() :: emysql:queue(),
-	       locked=gb_trees:empty() :: emysql:gb_tree(),
-	       waiting=queue:new() :: emysql:queue(),
+	       available=queue:new() :: t_queue(),
+	       locked=gb_trees:empty() :: t_gb_tree(),
+	       waiting=queue:new() :: t_queue(),
 	       start_cmds=[] :: string(),
 	       conn_test_period=0 :: number(),
 	       connect_timeout=infinity :: number() | infinity,
