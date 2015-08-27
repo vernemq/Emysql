@@ -136,6 +136,23 @@
 % for record and constant defines
 -include("emysql.hrl").
 
+-export_type([
+         t_gb_tree/0,
+         t_queue/0,
+         t_dict/0
+]).
+
+-ifdef(namespaced_types).
+-type t_gb_tree() :: gb_trees:tree().
+-type t_queue() :: queue:queue().
+-type t_dict() :: dict:dict().
+-else.
+-type t_gb_tree() :: gb_tree().
+-type t_queue() :: queue().
+-type t_dict() :: dict().
+-endif.
+
+
 %% @spec start() -> ok
 %% @doc Start the Emysql application.
 %%
