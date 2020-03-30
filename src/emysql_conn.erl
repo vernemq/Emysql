@@ -187,7 +187,12 @@ open_connection(#pool{pool_id=PoolId, host=Host, port=Port, user=User,
                       start_cmds=StartCmds, connect_timeout=ConnectTimeout} = Pool) ->
      %-% io:format("~p open connection for pool ~p host ~p port ~p user ~p base ~p~n", [self(), PoolId, Host, Port, User, Database]),
      %-% io:format("~p open connection: ... connect ... ~n", [self()]),
-    case gen_tcp:connect(Host, Port, [binary, {packet, raw}, {active, false}, {recbuf, ?TCP_RECV_BUFFER}], ConnectTimeout) of
+    Opts0 = [binary, {packet, raw}, {active, false}, {recbuf, ?TCP_RECV_BUFFER}],
+    Opts = case is_ipv6(Host) of
+        true -> [inet6|Opts0];
+        false -> Opts0
+    end,
+    case gen_tcp:connect(Host, Port, Opts, ConnectTimeout) of
         {ok, Sock} ->
             #greeting {
                server_version = Version,
@@ -504,3 +509,24 @@ quote_loop([26 | Rest], Acc) ->
 
 quote_loop([C | Rest], Acc) ->
     quote_loop(Rest, [C | Acc]).
+
+% Taken from github.com/benoitc/hackney (hackney_util)... thanks!
+is_ipv6(Host) ->
+  case inet_parse:address(Host) of
+    {ok, {_, _, _, _, _, _, _, _}} ->
+      true;
+    {ok, {_, _, _, _}} ->
+      false;
+    _ ->
+      case inet:getaddr(Host, inet) of
+        {ok, _} ->
+          false;
+        _ ->
+          case inet:getaddr(Host, inet6) of
+            {ok, _} ->
+              true;
+            _ ->
+              false
+          end
+      end
+  end.
